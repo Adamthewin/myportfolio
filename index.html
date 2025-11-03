@@ -144,19 +144,25 @@
         <img class="thumb" src="images/web1.png" alt="Cosmetic Store UI" />
         <div class="meta"><div class="d-flex justify-content-between"><h3 class="h6 m-0">creativodesigned</h3><span class="badge badge-soft">Web Design</span></div><p class="m-0 muted">Website sample.</p></div>
       </article>
-      <article class="cardx" data-tags="photography" data-video="videos/coffee.mp4">
+
+
+      <article class="cardx" data-tags="photography" data-vimeo="https://player.vimeo.com/video/1133017552">
   <div class="thumb-wrapper">
-    <video class="thumb thumb-video" muted preload="metadata" loop poster="images/placeholder.jpg">
-      <source src="videos/coffee.mp4" type="video/mp4" />
+    
+    <!-- Hover preview video thumbnail -->
+    <video class="thumb thumb-video" muted loop preload="metadata"
+           poster="images/ZW1A3473.jpg">
+      <source src="videos/coffee.mp4" type="video/mp4">
     </video>
+
   </div>
 
   <div class="meta">
     <div class="d-flex justify-content-between">
-      <h3 class="h6 m-0">Coffee Cinematic</h3>
+      <h3 class="h6 m-0">Coffee Reel</h3>
       <span class="badge badge-soft">Video</span>
     </div>
-    <p class="m-0 muted">Cinematic product reel — coffee shots.</p>
+    <p class="m-0 muted">Cinematic coffee commercial.</p>
   </div>
 </article>
      
@@ -238,21 +244,39 @@
 
 <div id="videoModal" class="modal" style="display:none;">
   <div class="modal-content">
-    <video id="modalVideo" playsinline controls autoplay style="background:#000;"></video>
+    <iframe id="modalIframe"
+      src=""
+      frameborder="0"
+      allow="autoplay; fullscreen; picture-in-picture; clipboard-write"
+      allowfullscreen
+      playsinline
+      style="width:100%;height:100%;border:0;background:#000;"></iframe>
   </div>
 </div>
 
 <style>
-  #videoModal{
-    position:fixed; inset:0; display:none;
-    align-items:center; justify-content:center;
-    background:rgba(0,0,0,.85); z-index:99999;
-  }
-  #videoModal .modal-content{ max-width:90vw; max-height:90vh }
-  #videoModal video{
-    width:100%; max-width:90vw; max-height:90vh;
-    display:block; background:#000; object-fit:contain;
-  }
+#videoModal{
+  position:fixed;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,0,0,.85);
+  z-index:99999;
+  padding:20px;
+}
+#videoModal .modal-content{
+  max-width:90vw;
+  max-height:90vh;
+  width:90vw;
+  height:90vh;
+  position:relative;
+}
+#modalIframe{
+  width:100%;
+  height:100%;
+  display:block;
+}
 </style>
 
   <footer class="container py-3 d-flex justify-content-between">
@@ -290,44 +314,37 @@
     lb.addEventListener('click', e => { if(e.target===lb) lb.classList.remove('open'); });
     document.addEventListener('keydown', e => { if(e.key==='Escape') lb.classList.remove('open'); });
 
-    document.addEventListener("DOMContentLoaded", () => {
-  // Hover preview (optional)
-  document.querySelectorAll(".thumb-video").forEach(v => {
-    v.addEventListener("mouseenter", () => v.play());
-    v.addEventListener("mouseleave", () => { v.pause(); v.currentTime = 0; });
-  });
+   document.addEventListener("DOMContentLoaded", () => {
+  const withAutoplay = (url) => url.includes("?") ? url + "&autoplay=1" : url + "?autoplay=1";
 
-  // Click card to open modal
-  document.querySelectorAll(".cardx[data-video]").forEach(card => {
+  document.querySelectorAll(".cardx[data-vimeo]").forEach(card => {
     card.addEventListener("click", () => {
-      const src   = card.getAttribute("data-video");
+      const url   = card.getAttribute("data-vimeo");
       const modal = document.getElementById("videoModal");
-      const video = document.getElementById("modalVideo");
+      const iframe = document.getElementById("modalIframe");
 
-      // Show first, then set src and load
+      iframe.src = withAutoplay(url);
       modal.style.display = "flex";
-      video.src = src;
-      video.load(); // ensure first frame is decoded
-
-      // Wait for a decodable frame, then play (Chrome-safe)
-      const onReady = () => { video.play().catch(()=>{}); video.removeEventListener("loadeddata", onReady); };
-      video.addEventListener("loadeddata", onReady);
     });
   });
 
-  // Close modal on backdrop click
   document.getElementById("videoModal").addEventListener("click", (e) => {
-    // only close if clicking backdrop (not the video)
     if (e.target.id !== "videoModal") return;
-    const modal = e.currentTarget;
-    const video = document.getElementById("modalVideo");
-    video.pause();
-    video.removeAttribute("src"); // release
-    video.load();
+    const modal  = e.currentTarget;
+    const iframe = document.getElementById("modalIframe");
+    iframe.src = "";
     modal.style.display = "none";
   });
+
+  // ✅ Hover preview
+  document.querySelectorAll(".thumb-video").forEach(v => {
+    v.addEventListener("mouseenter", () => v.play());
+    v.addEventListener("mouseleave", () => {
+      v.pause();
+      v.currentTime = 0;
+    });
+  });
 });
-  
 
   </script>
 
