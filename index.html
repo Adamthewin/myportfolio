@@ -144,12 +144,21 @@
         <img class="thumb" src="images/web1.png" alt="Cosmetic Store UI" />
         <div class="meta"><div class="d-flex justify-content-between"><h3 class="h6 m-0">creativodesigned</h3><span class="badge badge-soft">Web Design</span></div><p class="m-0 muted">Website sample.</p></div>
       </article>
-      <article class="cardx" data-tags="web">
-        <img class="thumb" src="images/web2.png" alt="SaaS Landing" />
-        <div class="meta"><div class="d-flex justify-content-between"><h3 class="h6 m-0">Portfolio</h3><span class="badge badge-soft">Web Design</span></div><p class="m-0 muted">Portfolio Website.</p></div>
-      </article>
+      <article class="cardx" data-tags="photography" data-video="videos/coffee.mp4">
+  <div class="thumb-wrapper">
+    <video class="thumb thumb-video" muted preload="metadata" loop poster="images/placeholder.jpg">
+      <source src="videos/coffee.mp4" type="video/mp4" />
+    </video>
+  </div>
 
-      <!-- MIXED -->
+  <div class="meta">
+    <div class="d-flex justify-content-between">
+      <h3 class="h6 m-0">Coffee Cinematic</h3>
+      <span class="badge badge-soft">Video</span>
+    </div>
+    <p class="m-0 muted">Cinematic product reel — coffee shots.</p>
+  </div>
+</article>
      
       
     </div>
@@ -227,6 +236,24 @@
   </div>
 </section>
 
+<div id="videoModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <video id="modalVideo" playsinline controls autoplay style="background:#000;"></video>
+  </div>
+</div>
+
+<style>
+  #videoModal{
+    position:fixed; inset:0; display:none;
+    align-items:center; justify-content:center;
+    background:rgba(0,0,0,.85); z-index:99999;
+  }
+  #videoModal .modal-content{ max-width:90vw; max-height:90vh }
+  #videoModal video{
+    width:100%; max-width:90vw; max-height:90vh;
+    display:block; background:#000; object-fit:contain;
+  }
+</style>
 
   <footer class="container py-3 d-flex justify-content-between">
     <small class="muted">© <span id="yr"></span> Thewin</small>
@@ -262,6 +289,48 @@
     lbClose.addEventListener('click', ()=> lb.classList.remove('open'));
     lb.addEventListener('click', e => { if(e.target===lb) lb.classList.remove('open'); });
     document.addEventListener('keydown', e => { if(e.key==='Escape') lb.classList.remove('open'); });
+
+    document.addEventListener("DOMContentLoaded", () => {
+  // Hover preview (optional)
+  document.querySelectorAll(".thumb-video").forEach(v => {
+    v.addEventListener("mouseenter", () => v.play());
+    v.addEventListener("mouseleave", () => { v.pause(); v.currentTime = 0; });
+  });
+
+  // Click card to open modal
+  document.querySelectorAll(".cardx[data-video]").forEach(card => {
+    card.addEventListener("click", () => {
+      const src   = card.getAttribute("data-video");
+      const modal = document.getElementById("videoModal");
+      const video = document.getElementById("modalVideo");
+
+      // Show first, then set src and load
+      modal.style.display = "flex";
+      video.src = src;
+      video.load(); // ensure first frame is decoded
+
+      // Wait for a decodable frame, then play (Chrome-safe)
+      const onReady = () => { video.play().catch(()=>{}); video.removeEventListener("loadeddata", onReady); };
+      video.addEventListener("loadeddata", onReady);
+    });
+  });
+
+  // Close modal on backdrop click
+  document.getElementById("videoModal").addEventListener("click", (e) => {
+    // only close if clicking backdrop (not the video)
+    if (e.target.id !== "videoModal") return;
+    const modal = e.currentTarget;
+    const video = document.getElementById("modalVideo");
+    video.pause();
+    video.removeAttribute("src"); // release
+    video.load();
+    modal.style.display = "none";
+  });
+});
+  
+
   </script>
+
+  
 </body>
 </html>
